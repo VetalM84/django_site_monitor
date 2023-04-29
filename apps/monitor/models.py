@@ -11,7 +11,7 @@ class Project(models.Model):
     check_interval = models.IntegerField(
         default=24, verbose_name="Check Interval in hours"
     )
-    is_active = models.BooleanField(default=True, verbose_name="Is Active")
+    is_active = models.BooleanField(default=False, verbose_name="Is Active")
 
     # user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="User")
 
@@ -22,6 +22,7 @@ class Project(models.Model):
     class Meta:
         """Meta."""
 
+        db_table = "project"
         verbose_name = "Project"
         verbose_name_plural = "Projects"
         ordering = ["name", "is_active"]
@@ -35,12 +36,6 @@ class ProjectDetail(models.Model):
     )
     url = models.URLField(verbose_name="URL")
     pagination = models.IntegerField(default=0, verbose_name="Pagination count")
-    items_container = models.OneToOneField(
-        "ItemsContainer",
-        on_delete=models.CASCADE,
-        primary_key=True,
-        verbose_name="Items container",
-    )
     # single_item_container = models.CharField(
     #     max_length=1024, blank=True, default=None, verbose_name="Single item container"
     # )
@@ -53,6 +48,7 @@ class ProjectDetail(models.Model):
     class Meta:
         """Meta."""
 
+        db_table = "project_detail"
         verbose_name = "Project Detail"
         verbose_name_plural = "Projects Details"
         ordering = ["is_active"]
@@ -61,7 +57,7 @@ class ProjectDetail(models.Model):
 class ItemsContainer(models.Model):
     """Items Container Model."""
 
-    project_detail = models.ForeignKey(
+    project_detail = models.OneToOneField(
         ProjectDetail, on_delete=models.CASCADE, verbose_name="Project Detail"
     )
     html_tag = models.CharField(
@@ -78,15 +74,17 @@ class ItemsContainer(models.Model):
         """String representation of the model."""
         return self.project_detail.project.name, self.project_detail.url[:50], "..."
 
-    # TODO: add validation for tag, selector - one of them must be filled
     def clean(self):
-        """Clean."""
-        if not self.html_tag and not self.selector:
+        """Validation for tag, selector - one of them must be filled."""
+        if (not self.html_tag and not self.selector) or (
+            self.html_tag and self.selector
+        ):
             raise ValidationError("Tag or Selector must be filled")
 
     class Meta:
         """Meta."""
 
+        db_table = "items_container"
         verbose_name = "Items Container"
         verbose_name_plural = "Items Containers"
 
@@ -106,7 +104,14 @@ class Item(models.Model):
     selector = models.CharField(
         max_length=1024, blank=True, default=None, verbose_name="Selector"
     )
-    html_attribute = models.CharField(
+    html_attr = models.CharField(
         max_length=1024, default=None, blank=True, verbose_name="HTML attribute"
     )
     text = models.BooleanField(default=False, verbose_name="Extract text")
+
+    class Meta:
+        """Meta."""
+
+        db_table = "item"
+        verbose_name = "Item"
+        verbose_name_plural = "Items"

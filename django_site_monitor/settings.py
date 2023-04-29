@@ -2,6 +2,7 @@
 
 import os
 from pathlib import Path
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -31,6 +32,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'apps.monitor',
+    'formtools',
+    'crispy_forms',
+    'crispy_bootstrap5',
     # 'django_dramatiq',
     # 'django_apscheduler',
 ]
@@ -62,6 +66,11 @@ TEMPLATES = [
         },
     },
 ]
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+
+CRISPY_TEMPLATE_PACK = "bootstrap5"
+
 # AUTH_USER_MODEL = 'accounts.User'
 
 WSGI_APPLICATION = 'django_site_monitor.wsgi.application'
