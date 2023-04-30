@@ -1,20 +1,15 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div class="container">
-        <div class="row align-items-start">
-            <div class="col">
-                <form class="pt-4" hx-post="/" hx-target="this" hx-swap="innerHTML" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {{ project_form.as_div }}
-                    <button class="btn btn-primary" type="submit">Save</button>
-                </form>
-
-            </div>
-            <div class="col">
-                One of two columns
-            </div>
+    <div class="row align-items-start">
+        <div class="col">
+            <a href="{% url 'new-project' %}">New</a>
+            {% for project in projects %}
+                <a href="project/{{ project.id }}">{{ project.name }}</a>
+            {% endfor %}
         </div>
-
+        <div class="col">
+            One of two columns
+        </div>
     </div>
 {% endblock %}

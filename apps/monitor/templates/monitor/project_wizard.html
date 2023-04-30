@@ -6,7 +6,6 @@
 {% endblock %}
 
 {% block content %}
-    <div class="container">
     <div class="row">
         <div class="col-md-12">
             <h1>Wizard</h1>
@@ -24,12 +23,15 @@
                 {% endif %}
 
                 {% if wizard.steps.prev %}
-                    <button name="wizard_goto_step" type="submit" value="{{ wizard.steps.first }}">first step</button>
-                    <button name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}">prev step</button>
+                    <button name="wizard_goto_step" class="btn btn-secondary" type="submit"
+                            value="{{ wizard.steps.first }}">first step
+                    </button>
+                    <button name="wizard_goto_step" class="btn btn-secondary" type="submit"
+                            value="{{ wizard.steps.prev }}">prev step
+                    </button>
                 {% endif %}
-                <input type="submit" value="submit">
+                <input type="submit" class="btn btn-primary" value="Submit">
             </form>
         </div>
-    </div>
     </div>
 {% endblock %}

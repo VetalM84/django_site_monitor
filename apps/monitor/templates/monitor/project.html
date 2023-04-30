@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Title{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Project "{{ project.name }}"</h1>
+            <p>{{ project.check_interval }}</p>
+            <p>{{ project.is_active }}</p>
+            <h2>Details</h2>
+            {% for unit in project_units %}
+                <div class="btn btn-outline-secondary" hx-get="{% url "unit-items" unit.pk %}" hx-target="#result" hx-swap="innerHTML"
+                     hx-trigger="click" id="unit-{{ unit.pk }}">
+                    <p>Active: {{ unit.is_active }}</p>
+                    <p>URL: {{ unit.url }}</p>
+                    <p>Page count: {{ unit.pagination }}</p>
+                    <p>container_html_tag: {{ unit.container_html_tag }}</p>
+                    <p>container_html_tag_class: {{ unit.container_html_tag_class }}</p>
+                    <p>container_selector: {{ unit.container_selector }}</p>
+                </div>
+            {% endfor %}
+            <div id="result"></div>
+        </div>
+    </div>
+{% endblock %}
