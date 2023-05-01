@@ -1,0 +1,119 @@
+body, html {
+    overflow-x: hidden;
+    padding-right: 0 !important;
+    background: #F5F7FF !important;
+    font-size: 1rem !important;
+    font-weight: initial;
+    line-height: normal !important;
+    -webkit-font-smoothing: antialiased;
+}
+.container-scroller {
+    overflow: hidden;
+}
+.page-body-wrapper {
+    padding-left: 0;
+    padding-right: 0;
+}
+.main-panel {
+    background: #F5F7FF;
+    width: 100%;
+}
+.content-wrapper {
+    padding: 2rem 0;
+    width: 100%;
+    padding-right: var(--bs-gutter-x, 0.75rem);
+    padding-left: var(--bs-gutter-x, 0.75rem);
+    margin-right: auto;
+    margin-left: auto;
+    min-height: calc(100vh - 135px - 75px);
+    -webkit-flex-grow: 1;
+    flex-grow: 1;
+}
+.bg-primary-sky {
+    background: #4B49AC;
+}
+.navbar-shadow {
+    box-shadow: 0 19px 34px -15px #d2d2f2;
+    -webkit-box-shadow: 0 19px 34px -15px #d2d2f2;
+    -moz-box-shadow: 0 19px 34px -15px #d2d2f2;
+}
+p {
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem !important;
+    line-height: 1.3rem;
+}
+.card {
+    border: none !important;
+    border-radius: 20px !important;
+}
+.card .card-title {
+    color: #010101;
+    margin-bottom: 1.2rem;
+    text-transform: capitalize;
+    font-size: 1.125rem;
+    font-weight: 600;
+}
+.card .card-body {
+    padding: 1.25rem 1.25rem;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.5;
+}
+.card-body {
+    flex: 1 1 auto;
+    padding: 1rem 1rem;
+}
+.table thead th {
+    border-top: 0;
+    border-bottom-width: 1px;
+    font-weight: 600;
+    font-size: .875rem;
+}
+.table td {
+    font-size: 0.875rem;
+}
+.table th {
+    vertical-align: middle;
+    line-height: 1;
+    white-space: nowrap;
+    padding: 1.125rem 1.375rem;
+}
+.form-control {
+    border: 1px solid #CED4DA !important;
+    font-weight: 400 !important;
+    font-size: 0.875rem !important;
+    border-radius: 4px !important;
+    line-height: 2.0rem !important;
+}
+.form-check {
+    position: relative;
+    margin-top: 10px;
+}
+.form-check .form-check-label {
+    margin-left: 0.5rem;
+    margin-top: 0.25rem;
+}
+.form-check .form-check-label input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin-left: 0;
+    margin-top: 0;
+    z-index: 1;
+    cursor: pointer;
+    opacity: 0;
+    filter: alpha(opacity=0);
+}
+.btn {
+    border-radius: 15px !important;
+    font-size: 0.875rem  !important;
+    line-height: 1 !important;
+    font-weight: 400 !important;
+    padding: 0.875rem 1.5rem !important;
+}
+.form-label {
+    font-size: 0.875rem;
+    line-height: 1.4rem;
+    vertical-align: top;
+    margin-bottom: 0.5rem;
+}

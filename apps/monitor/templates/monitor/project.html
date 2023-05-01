@@ -4,24 +4,37 @@
 
 {% block content %}
     <div class="row">
-        <div class="col-md-12">
-            <h1>Project "{{ project.name }}"</h1>
-            <p>check_interval: {{ project.check_interval }}</p>
-            <p>is_active: {{ project.is_active }}</p>
-            <h2>Modules</h2>
-            {% for unit in project_units %}
-                <div class="btn btn-outline-secondary" hx-post="{% url "unit-items" unit.pk %}" hx-target="#result"
-                     hx-swap="innerHTML" hx-trigger="click" id="unit-{{ unit.pk }}"
-                     hx-headers='{ "X-CSRFToken": "{{ csrf_token }}" }'>
-                    <p>Active: {{ unit.is_active }}</p>
-                    <p>URL: {{ unit.url }}</p>
-                    <p>Page count: {{ unit.pagination }}</p>
-                    <p>container_html_tag: {{ unit.container_html_tag }}</p>
-                    <p>container_html_tag_class: {{ unit.container_html_tag_class }}</p>
-                    <p>container_selector: {{ unit.container_selector }}</p>
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h4>Project "{{ project.name }}"</h4>
+                    <p>check_interval: {{ project.check_interval }}</p>
+                    <p>is_active: {{ project.is_active }}</p>
                 </div>
-            {% endfor %}
-            <div id="result"></div>
+                <div class="card-body">
+                    <h2 class="card-title">Modules</h2>
+                    {% for unit in project_units %}
+                        <ul class="" hx-post="{% url "unit-items" unit.pk %}"
+                             hx-target="#result" hx-swap="innerHTML" hx-trigger="click"
+                             id="unit-{{ unit.pk }}" hx-headers='{ "X-CSRFToken": "{{ csrf_token }}" }'>
+                            <li>Active: {{ unit.is_active }}</li>
+                            <li>URL: {{ unit.url }}</li>
+                            <li>Page count: {{ unit.pagination }}</li>
+                            <li>container_html_tag: {{ unit.container_html_tag }}</li>
+                            <li>container_html_tag_class: {{ unit.container_html_tag_class }}</li>
+                            <li>container_selector: {{ unit.container_selector }}</li>
+                        </ul>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <div id="result"></div>
+                </div>
+            </div>
         </div>
     </div>
 {% endblock %}
