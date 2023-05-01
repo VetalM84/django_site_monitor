@@ -10,9 +10,11 @@ class Project(models.Model):
 
     name = models.CharField(max_length=50, blank=False, verbose_name="Project name")
     check_interval = models.IntegerField(
-        default=24, verbose_name="Check Interval in hours"
+        default=24, verbose_name="Check interval in hours"
     )
-    is_active = models.BooleanField(default=False, verbose_name="Is Active")
+    is_active = models.BooleanField(default=False, verbose_name="Is active")
+    date_created = models.DateTimeField(auto_now_add=True, verbose_name="Date created")
+    last_run = models.DateTimeField(null=True, blank=True, verbose_name="Last run")
 
     # user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="User")
 

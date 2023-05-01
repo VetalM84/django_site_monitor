@@ -2,7 +2,7 @@
 
 from django import forms
 
-from apps.monitor.models import UnitItem, Project, ProjectUnit
+from apps.monitor.models import Project, ProjectUnit, UnitItem
 
 
 class ProjectForm(forms.ModelForm):
@@ -26,7 +26,7 @@ class ProjectForm(forms.ModelForm):
         """Meta."""
 
         model = Project
-        fields = "__all__"
+        fields = ["name", "check_interval", "is_active"]
 
 
 class ProjectUnitForm(forms.ModelForm):
@@ -85,14 +85,14 @@ class ProjectUnitForm(forms.ModelForm):
 class UnitItemForm(forms.ModelForm):
     """Unit Item form."""
 
-    # items_container = forms.ModelChoiceField(
+    # project_unit = forms.ModelChoiceField(
     #     queryset=ItemsContainer.objects.all(),
     #     widget=forms.Select(attrs={"class": "form-select"}),
     # )
     html_tag = forms.CharField(
         required=False,
         widget=forms.TextInput(
-            attrs={"class": "form-control", "placeholder": "div, span, ul, etc."}
+            attrs={"class": "form-control", "placeholder": "div, span, ul, ...."}
         ),
     )
     html_tag_class = forms.CharField(
@@ -105,12 +105,14 @@ class UnitItemForm(forms.ModelForm):
         required=False, widget=forms.TextInput(attrs={"class": "form-control"})
     )
     extract_text = forms.BooleanField(
-        required=False, widget=forms.CheckboxInput(attrs={"class": "form-check"})
+        required=False,
+        widget=forms.CheckboxInput(
+            attrs={"class": "form-check", "placeholder": "href, data-id, ...."}
+        ),
     )
 
     class Meta:
         """Meta."""
 
         model = UnitItem
-        # fields = "__all__"
-        exclude = ["items_container"]
+        exclude = ["project_unit"]

@@ -1,17 +1,18 @@
+import json
+
 from asgiref.sync import sync_to_async
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from formtools.wizard.views import SessionWizardView
 
 from .forms import ProjectForm, ProjectUnitForm, UnitItemForm
-from django.http import HttpResponse
-
 from .models import Project, ProjectUnit, UnitItem
 
 
 class ProjectWizardView(SessionWizardView):
     """Project Wizard form set."""
 
-    form_list = [ProjectForm, ProjectUnitForm]
+    form_list = [ProjectForm, ProjectUnitForm, UnitItemForm]
     template_name = "monitor/project_wizard.html"
 
     def done(self, form_list, **kwargs):
@@ -20,15 +21,20 @@ class ProjectWizardView(SessionWizardView):
         project_unit = form_list[1].save(commit=False)
         project_unit.project = project
         project_unit.save()
-        # items_container = form_list[2].save(commit=False)
-        # items_container.project_unit = project_unit
-        # items_container.save()
+        unit_items = form_list[2].save(commit=False)
+        unit_items.project_unit = project_unit
+        unit_items.save()
         return HttpResponse("Done")
 
 
 async def index(request):
     """Index view."""
-    projects = list([project async for project in Project.objects.all()])
+    projects = list(
+        [
+            project
+            async for project in Project.objects.all().prefetch_related("project_units")
+        ]
+    )
     # projects = Project.objects.prefetch_related("projects")
     return render(request, "monitor/index.html", context={"projects": projects})
 
@@ -48,7 +54,7 @@ async def get_project(request, project_id: int):
 
 async def get_all_unit_items(request, unit_id: int):
     """upon HTMX request."""
-    if request.method == "GET":
+    if request.method == "POST":
         try:
             unit_items = list(
                 [
@@ -56,8 +62,9 @@ async def get_all_unit_items(request, unit_id: int):
                     async for item in UnitItem.objects.filter(project_unit_id=unit_id)
                 ]
             )
-            print(unit_items)
-            return HttpResponse(unit_items)
+            return render(
+                request, "monitor/_unit_items.html", context={"unit_items": unit_items}
+            )
         except Exception as e:
             return HttpResponse(f"Error: {e}")
     else:
