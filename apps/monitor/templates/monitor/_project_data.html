@@ -2,5 +2,5 @@
     <h4 class="card-title">Project "{{ project.name|truncatechars:30 }}"</h4>
     <a href hx-trigger="click" hx-get="{% url "htmx-edit-project" project.pk %}">Edit</a>
 </div>
-<p>Check interval: {{ project.check_interval }} hours</p>
-<p>Is active: {{ project.is_active }}</p>
+<p><span class="fw-semibold">Check interval:</span> {{ project.check_interval }} hours</p>
+<p><span class="fw-semibold">Is active:</span> {{ project.is_active }}</p>

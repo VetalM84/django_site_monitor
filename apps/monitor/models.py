@@ -28,23 +28,23 @@ class Project(models.Model):
     class Meta:
         """Meta."""
 
-        db_table = "monitor_project"
         verbose_name = "Project"
         verbose_name_plural = "Projects"
         ordering = ["name", "is_active"]
         # unique_together = ["user", "name"]
 
 
-class ProjectUnit(models.Model):
-    """Project Unit Model."""
+class ProjectModule(models.Model):
+    """Project Module Model."""
 
     project = models.ForeignKey(
         Project,
-        related_name="project_units",
+        related_name="modules",
         on_delete=models.CASCADE,
         verbose_name="Project name",
     )
     is_active = models.BooleanField(default=True, verbose_name="Is Active")
+    date_created = models.DateTimeField(auto_now_add=True, verbose_name="Date created")
     url = models.URLField(verbose_name="URL")
     pagination = models.IntegerField(default=0, verbose_name="Pagination count")
     container_html_tag = models.CharField(
@@ -62,6 +62,7 @@ class ProjectUnit(models.Model):
         return self.project.name + ", " + self.url[:50] + "..."
 
     def get_absolute_url(self):
+        # TODO: check url
         return reverse_lazy("unit-items", kwargs={"unit_id": self.pk})
 
     def clean(self):
@@ -79,18 +80,17 @@ class ProjectUnit(models.Model):
     class Meta:
         """Meta."""
 
-        db_table = "monitor_project_unit"
-        verbose_name = "Project unit"
-        verbose_name_plural = "Project units"
+        verbose_name = "Project module"
+        verbose_name_plural = "Project modules"
         ordering = ["is_active"]
 
 
-class UnitItem(models.Model):
-    """Project Unit Item Model."""
+class ModuleItem(models.Model):
+    """Project Module Item Model."""
 
     project_unit = models.ForeignKey(
-        ProjectUnit,
-        related_name="unit_items",
+        ProjectModule,
+        related_name="module_items",
         on_delete=models.CASCADE,
         verbose_name="Project unit",
     )
@@ -111,6 +111,5 @@ class UnitItem(models.Model):
     class Meta:
         """Meta."""
 
-        db_table = "monitor_unit_item"
-        verbose_name = "Unit item"
-        verbose_name_plural = "Unit items"
+        verbose_name = "Module item"
+        verbose_name_plural = "Module items"

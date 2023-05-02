@@ -1,18 +1,21 @@
-import json
+"""."""
 
 from asgiref.sync import sync_to_async
+import requests
+import asyncio
+import aiohttp
 from django.http import HttpResponse
 from django.shortcuts import render
 from formtools.wizard.views import SessionWizardView
 
-from .forms import ProjectForm, ProjectUnitForm, UnitItemForm
-from .models import Project, ProjectUnit, UnitItem
+from .forms import ModuleItemForm, ProjectForm, ProjectModuleForm
+from .models import ModuleItem, Project, ProjectModule
 
 
 class ProjectWizardView(SessionWizardView):
-    """Project Wizard form set."""
+    """New Project Wizard form set."""
 
-    form_list = [ProjectForm, ProjectUnitForm, UnitItemForm]
+    form_list = [ProjectForm, ProjectModuleForm, ModuleItemForm]
     template_name = "monitor/project_wizard.html"
 
     def done(self, form_list, **kwargs):
@@ -27,28 +30,32 @@ class ProjectWizardView(SessionWizardView):
         return HttpResponse("Done")
 
 
+# async def index(request):
+#     """Index view."""
+#     projects = list(
+#         [
+#             project
+#             async for project in Project.objects.all().prefetch_related("project_units")
+#         ]
+#     )
+#     return render(request, "monitor/index.html", context={"projects": projects})
+
+
 async def index(request):
-    """Index view."""
+    # TODO: replace with user's dashboard
     projects = list(
-        [
-            project
-            async for project in Project.objects.all().prefetch_related("project_units")
-        ]
+        [project async for project in Project.objects.all().prefetch_related("modules")]
     )
-    # projects = Project.objects.prefetch_related("projects")
     return render(request, "monitor/index.html", context={"projects": projects})
 
 
 async def get_project(request, project_id: int):
-    """Project view."""
-    project = await get_project_object(project_id=project_id)
-    proj_units = list(
-        [item async for item in project.project_units.filter(project_id=project_id)]
-    )
+    """Detailed project view with modules."""
+    project = await Project.objects.prefetch_related("modules").aget(pk=project_id)
     return render(
         request,
         "monitor/project.html",
-        context={"project": project, "project_units": proj_units},
+        context={"project": project, "call_url": call_url},
     )
 
 
@@ -62,12 +69,36 @@ async def htmx_get_project_to_edit(request, project_id: int):
     )
 
 
+async def call_url(url: str):
+    """Make a request to an external url."""
+    # TODO: add headers to aiohttp.ClientSession
+    # TODO: add timeout to aiohttp.ClientSession
+    # TODO: add exception handling
+    # TODO: add user check
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url=url) as response:
+            response_code = response.status
+            if response_code == 200:
+                return HttpResponse(content="Page response OK", status=200)
+            else:
+                return HttpResponse(
+                    content=f"Error. Response code is {response_code}",
+                    status=response_code,
+                )
+
+
 async def get_project_object(project_id: int):
     """Get project object."""
     try:
         return await Project.objects.aget(pk=project_id)
     except Exception as e:
         return HttpResponse(f"Error: {e}")
+
+
+async def htmx_call_url(request):
+    """Call url with HTMX request."""
+    if request.method == "POST":
+        return await call_url(url=request.POST.get("url"))
 
 
 async def htmx_get_project_data(request, project_id: int):
@@ -110,7 +141,7 @@ async def get_all_unit_items(request, unit_id: int):
             unit_items = list(
                 [
                     item
-                    async for item in UnitItem.objects.filter(project_unit_id=unit_id)
+                    async for item in ModuleItem.objects.filter(project_unit_id=unit_id)
                 ]
             )
             return render(

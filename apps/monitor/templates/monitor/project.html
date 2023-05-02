@@ -4,32 +4,52 @@
 
 {% block content %}
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-9 grid-margin stretch-card">
             <div class="card">
-                <!-- htmx edit project -->
+                <!-- htmx get/edit project data -->
                 <div class="card-body" hx-target="this" hx-swap="innerHTML">
                     {% include "monitor/_project_data.html" %}
                 </div>
-                <!-- htmx edit project END -->
+                <!-- htmx get/edit project data END -->
+            </div>
+        </div>
+        <div class="col-md-3 grid-margin stretch-card">
+            <div class="card">
                 <div class="card-body">
-                    <h2 class="card-title">Modules</h2>
-                    {% for unit in project_units %}
-                        <ul class="" hx-post="{% url "htmx-unit-items" unit.pk %}"
-                            hx-target="#result" hx-swap="innerHTML" hx-trigger="click"
-                            id="unit-{{ unit.pk }}" hx-headers='{ "X-CSRFToken": "{{ csrf_token }}" }'>
-                            <li>Active: {{ unit.is_active }}</li>
-                            <li>URL: {{ unit.url }}</li>
-                            <li>Page count: {{ unit.pagination }}</li>
-                            <li>container_html_tag: {{ unit.container_html_tag }}</li>
-                            <li>container_html_tag_class: {{ unit.container_html_tag_class }}</li>
-                            <li>container_selector: {{ unit.container_selector }}</li>
-                        </ul>
+                    <p><span class="fw-semibold">Last run:</span> {{ project.last_run }}</p>
+                    <p><span class="fw-semibold">Modules:</span> {{ project.modules.count }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8 grid-margin">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">Modules in this project</h2>
+                    {% for module in project.modules.all %}
+                        <div>
+                            <p><span class="fw-semibold">Active:</span> {{ module.is_active }}</p>
+                            <p>
+                                <form hx-headers='{ "X-CSRFToken": "{{ csrf_token }}" }'>
+                                    <span class="fw-semibold">URL:</span> {{ module.url }}
+                                    <input type="hidden" name="url" value="{{ module.url }}">
+                                    <button class="btn btn-outline-secondary btn-sm ms-2" hx-trigger="click"
+                                            hx-post="{% url "htmx-call-url" %}" hx-swap="innerHTML">Check URL
+                                    </button>
+                                </form>
+                            </p>
+                            <p><span class="fw-semibold">Pagination count:</span> {{ module.pagination }}</p>
+                            <p><span class="fw-semibold">HTML tag:</span> {{ module.container_html_tag }}</p>
+                            <p><span class="fw-semibold">HTML tag class:</span> {{ module.container_html_tag_class }}
+                            </p>
+                            <p><span class="fw-semibold">Selector:</span> {{ module.container_selector }}</p>
+                        </div>
                     {% endfor %}
                 </div>
             </div>
         </div>
-
-        <div class="col-md-4">
+        <div class="col-md-4 grid-margin">
             <div class="card">
                 <div class="card-body">
                     <div id="result"></div>
@@ -37,4 +57,5 @@
             </div>
         </div>
     </div>
+
 {% endblock %}

@@ -40,6 +40,20 @@ p {
     margin-bottom: 0.5rem !important;
     line-height: 1.3rem;
 }
+.grid-margin {
+    margin-bottom: 2.5rem;
+}
+.stretch-card {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-align-items: stretch;
+    align-items: stretch;
+    justify-content: stretch;
+}
+.stretch-card > .card {
+    width: 100%;
+    min-width: 100%;
+}
 .card {
     border: none !important;
     border-radius: 20px !important;
@@ -103,11 +117,8 @@ p {
     filter: alpha(opacity=0);
 }
 .btn {
-    border-radius: 15px !important;
-    font-size: 0.875rem  !important;
-    line-height: 1 !important;
-    font-weight: 400 !important;
-    padding: 0.875rem 1.5rem !important;
+    border-radius: 10px !important;
+    font-size: 0.9rem  !important;
 }
 .form-label {
     font-size: 0.875rem;

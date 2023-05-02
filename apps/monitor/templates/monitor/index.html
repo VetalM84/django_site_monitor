@@ -11,10 +11,10 @@
                             <thead>
                             <tr>
                                 <th></th>
-                                <th>ID</th>
                                 <th>Name</th>
+                                <th>Interval</th>
                                 <th>Last run</th>
-                                <th>Units count</th>
+                                <th>Modules count</th>
                                 <th>Date created</th>
                                 <th>Is active</th>
                             </tr>
@@ -29,10 +29,10 @@
                                                 <i class="input-helper"></i></label>
                                         </div>
                                     </td>
-                                    <td>{{ project.id }}</td>
-                                    <td><a href="{% url "get-project" project.id %}">{{ project.name }}</a></td>
+                                    <td><a href="{% url "get-project" project.id %}">{{ project.name|truncatechars:25 }}</a></td>
+                                    <td>{{ project.check_interval }} hour{{ project.check_interval|pluralize }}</td>
                                     <td>{{ project.last_run }}</td>
-                                    <td>{{ project.project_units.count }}</td>
+                                    <td>{{ project.modules.count }}</td>
                                     <td>{{ project.date_created }}</td>
                                     <td>
                                         <div class="badge text-bg-success">{{ project.is_active }}</div>

@@ -2,7 +2,7 @@
 
 from django import forms
 
-from apps.monitor.models import Project, ProjectUnit, UnitItem
+from apps.monitor.models import ModuleItem, Project, ProjectModule
 
 
 class ProjectForm(forms.ModelForm):
@@ -31,7 +31,7 @@ class ProjectForm(forms.ModelForm):
         fields = ["name", "check_interval", "is_active"]
 
 
-class ProjectUnitForm(forms.ModelForm):
+class ProjectModuleForm(forms.ModelForm):
     """Project Unit form."""
 
     # project = forms.ModelChoiceField(
@@ -73,7 +73,7 @@ class ProjectUnitForm(forms.ModelForm):
     class Meta:
         """Meta."""
 
-        model = ProjectUnit
+        model = ProjectModule
         fields = [
             "url",
             "pagination",
@@ -84,7 +84,7 @@ class ProjectUnitForm(forms.ModelForm):
         ]
 
 
-class UnitItemForm(forms.ModelForm):
+class ModuleItemForm(forms.ModelForm):
     """Unit Item form."""
 
     # project_unit = forms.ModelChoiceField(
@@ -116,5 +116,5 @@ class UnitItemForm(forms.ModelForm):
     class Meta:
         """Meta."""
 
-        model = UnitItem
+        model = ModuleItem
         exclude = ["project_unit"]
