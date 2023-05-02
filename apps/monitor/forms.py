@@ -9,7 +9,9 @@ class ProjectForm(forms.ModelForm):
     """Project form."""
 
     name = forms.CharField(
-        label="Project name", widget=forms.TextInput(attrs={"class": "form-control"})
+        label="Project name",
+        max_length=50,
+        widget=forms.TextInput(attrs={"class": "form-control"}),
     )
     check_interval = forms.IntegerField(
         label="Check Interval in hours",

@@ -1,6 +1,13 @@
 from django.urls import path
 
-from apps.monitor.views import ProjectWizardView, get_all_unit_items, get_project, index
+from apps.monitor.views import (
+    ProjectWizardView,
+    get_all_unit_items,
+    get_project,
+    index,
+    htmx_edit_project,
+    htmx_get_project_data,
+)
 
 urlpatterns = [
     path("", index, name="index"),
@@ -8,10 +15,16 @@ urlpatterns = [
     path("project/<int:project_id>/", get_project, name="get-project"),
 ]
 htmx_patterns = [
+    path("project/<int:project_id>/edit/", htmx_edit_project, name="htmx-edit-project"),
+    path(
+        "get-project-data/<int:project_id>/",
+        htmx_get_project_data,
+        name="htmx-get-project-data",
+    ),
     path(
         "unit-items/<int:unit_id>/",
         get_all_unit_items,
-        name="unit-items",
+        name="htmx-unit-items",
     ),
 ]
 
