@@ -27,25 +27,11 @@
             <div class="card">
                 <div class="card-body">
                     <h2 class="card-title">Modules in this project</h2>
-                    {% for module in project.modules.all %}
-                        <div>
-                            <p><span class="fw-semibold">Active:</span> {{ module.is_active }}</p>
-                            <p>
-                                <form hx-headers='{ "X-CSRFToken": "{{ csrf_token }}" }'>
-                                    <span class="fw-semibold">URL:</span> {{ module.url }}
-                                    <input type="hidden" name="url" value="{{ module.url }}">
-                                    <button class="btn btn-outline-secondary btn-sm ms-2" hx-trigger="click"
-                                            hx-post="{% url "htmx-call-url" %}" hx-swap="innerHTML">Check URL
-                                    </button>
-                                </form>
-                            </p>
-                            <p><span class="fw-semibold">Pagination count:</span> {{ module.pagination }}</p>
-                            <p><span class="fw-semibold">HTML tag:</span> {{ module.container_html_tag }}</p>
-                            <p><span class="fw-semibold">HTML tag class:</span> {{ module.container_html_tag_class }}
-                            </p>
-                            <p><span class="fw-semibold">Selector:</span> {{ module.container_selector }}</p>
-                        </div>
+                    <!-- htmx get/edit module data -->
+                    {%  for module in project.modules.all %}
+                        {% include "monitor/_module_data.html" %}
                     {% endfor %}
+                    <!-- htmx get/edit module data END -->
                 </div>
             </div>
         </div>
@@ -57,5 +43,15 @@
             </div>
         </div>
     </div>
-
+{% endblock %}
+{% block script %}
+    <script>
+        <!-- htmx rewrite behavior to swap url response upon clicking on check url button -->
+        document.body.addEventListener('htmx:beforeSwap', function (evt) {
+            if (evt.detail.xhr.status === 500) {
+                evt.detail.shouldSwap = true;
+                evt.detail.isError = true;
+            }
+        });
+    </script>
 {% endblock %}

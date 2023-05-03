@@ -30,7 +30,7 @@ class Project(models.Model):
 
         verbose_name = "Project"
         verbose_name_plural = "Projects"
-        ordering = ["name", "is_active"]
+        ordering = ["name", "-is_active"]
         # unique_together = ["user", "name"]
 
 
@@ -82,7 +82,7 @@ class ProjectModule(models.Model):
 
         verbose_name = "Project module"
         verbose_name_plural = "Project modules"
-        ordering = ["is_active"]
+        ordering = ["-is_active"]
 
 
 class ModuleItem(models.Model):

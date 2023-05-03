@@ -2,5 +2,5 @@
     {% csrf_token %}
     {{ form.as_div }}
     <button type="submit" class="btn btn-primary">Submit</button>
-    <button hx-get="{% url "htmx-get-project-data" project.pk %}" type="submit" class="btn btn-secondary">Cancel</button>
+    <button hx-get="{% url "htmx-get-project" project.pk %}" type="submit" class="btn btn-secondary">Cancel</button>
 </form>

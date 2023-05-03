@@ -1,10 +1,12 @@
 """."""
 
-from asgiref.sync import sync_to_async
-import requests
 import asyncio
+
 import aiohttp
-from django.http import HttpResponse
+import requests
+from aiohttp import web
+from asgiref.sync import sync_to_async
+from django.http import HttpResponse, HttpResponseServerError
 from django.shortcuts import render
 from formtools.wizard.views import SessionWizardView
 
@@ -59,6 +61,46 @@ async def get_project(request, project_id: int):
     )
 
 
+async def call_url(url: str):
+    """Make a request to an external url."""
+    # TODO: move to class
+    # TODO: add headers to aiohttp.ClientSession
+    # TODO: add timeout to aiohttp.ClientSession
+    # TODO: add exception handling
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url=url) as response:
+                return response
+    except Exception as e:
+        print(e)
+        return web.Response(status=500)
+
+
+async def get_project_object(project_id: int):
+    """Get project object."""
+    try:
+        return await Project.objects.aget(pk=project_id)
+    except Exception as e:
+        return HttpResponseServerError(f"Error: {e}")
+
+
+async def htmx_call_url(request):
+    """Call url with HTMX request."""
+    # TODO: add user check
+    if request.method == "POST":
+        response = await call_url(url=request.POST.get("url"))
+        if response.status == 200:
+            return HttpResponse(content="Page response OK")
+        elif response.status == 404:
+            return HttpResponse(content="Page not found")
+        else:
+            # TODO: add errors list to else
+            return HttpResponse(
+                content=f"Error. Response code is {response.status}",
+                status=response.status,
+            )
+
+
 async def htmx_get_project_to_edit(request, project_id: int):
     project = await get_project_object(project_id=project_id)
     form = ProjectForm(instance=project)
@@ -69,39 +111,7 @@ async def htmx_get_project_to_edit(request, project_id: int):
     )
 
 
-async def call_url(url: str):
-    """Make a request to an external url."""
-    # TODO: add headers to aiohttp.ClientSession
-    # TODO: add timeout to aiohttp.ClientSession
-    # TODO: add exception handling
-    # TODO: add user check
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url=url) as response:
-            response_code = response.status
-            if response_code == 200:
-                return HttpResponse(content="Page response OK", status=200)
-            else:
-                return HttpResponse(
-                    content=f"Error. Response code is {response_code}",
-                    status=response_code,
-                )
-
-
-async def get_project_object(project_id: int):
-    """Get project object."""
-    try:
-        return await Project.objects.aget(pk=project_id)
-    except Exception as e:
-        return HttpResponse(f"Error: {e}")
-
-
-async def htmx_call_url(request):
-    """Call url with HTMX request."""
-    if request.method == "POST":
-        return await call_url(url=request.POST.get("url"))
-
-
-async def htmx_get_project_data(request, project_id: int):
+async def htmx_get_project(request, project_id: int):
     """Get project html data with HTMX request."""
     project = await get_project_object(project_id=project_id)
     return render(
@@ -132,6 +142,40 @@ async def htmx_edit_project(request, project_id: int):
             "monitor/_project_data.html",
             context={"project": project, "form": project_form},
         )
+
+
+async def get_module_object(module_id: int):
+    """Get module object."""
+    try:
+        return await ProjectModule.objects.aget(pk=module_id)
+    except Exception as e:
+        return HttpResponseServerError(f"Error: {e}")
+
+
+async def htmx_edit_module(request, module_id: int):
+    """Edit module with HTMX request."""
+    module = await get_module_object(module_id=module_id)
+    module_form = ProjectModuleForm(request.POST or None, instance=module)
+    context = {"module": module, "form": module_form}
+
+    # get edit form with data
+    if request.method == "GET":
+        return render(request, "monitor/_edit_module.html", context=context)
+    # save form data
+    elif request.method == "POST":
+        if module_form.is_valid():
+            await sync_to_async(module_form.save)()
+        return render(request, "monitor/_module_data.html", context=context)
+
+
+async def htmx_get_module(request, module_id: int):
+    """Get project html data with HTMX request."""
+    module = await get_module_object(module_id=module_id)
+    return render(
+        request,
+        "monitor/_module_data.html",
+        context={"module": module},
+    )
 
 
 async def get_all_unit_items(request, unit_id: int):
