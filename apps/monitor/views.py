@@ -3,10 +3,9 @@
 import asyncio
 
 import aiohttp
-import requests
 from aiohttp import web
 from asgiref.sync import sync_to_async
-from django.http import HttpResponse, HttpResponseServerError
+from django.http import HttpResponse, HttpResponseServerError, HttpResponseNotAllowed
 from django.shortcuts import render
 from formtools.wizard.views import SessionWizardView
 
@@ -165,17 +164,27 @@ async def htmx_edit_module(request, module_id: int):
     elif request.method == "POST":
         if module_form.is_valid():
             await sync_to_async(module_form.save)()
-        return render(request, "monitor/_module_data.html", context=context)
+            return render(request, "monitor/_module_data.html", context=context)
+        else:
+            return render(request, "monitor/_edit_module.html", context=context)
 
 
 async def htmx_get_module(request, module_id: int):
     """Get project html data with HTMX request."""
     module = await get_module_object(module_id=module_id)
-    return render(
-        request,
-        "monitor/_module_data.html",
-        context={"module": module},
-    )
+    return render(request, "monitor/_module_data.html", context={"module": module})
+
+
+async def htmx_delete_module(request, module_id: int):
+    """Delete project form DB with HTMX request."""
+    if request.method == "POST":
+        try:
+            await ProjectModule.objects.filter(pk=module_id).adelete()
+            return HttpResponse(content="Module deleted")
+        except Exception as e:
+            return HttpResponseServerError(f"Error: {e}")
+    else:
+        return HttpResponseNotAllowed("Error. Method not allowed.")
 
 
 async def get_all_unit_items(request, unit_id: int):

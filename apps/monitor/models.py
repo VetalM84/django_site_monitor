@@ -61,10 +61,6 @@ class ProjectModule(models.Model):
         """String representation of the model."""
         return self.project.name + ", " + self.url[:50] + "..."
 
-    def get_absolute_url(self):
-        # TODO: check url
-        return reverse_lazy("unit-items", kwargs={"unit_id": self.pk})
-
     def clean(self):
         """Validation for url, pagination."""
         # TODO: send request to url, check response status code

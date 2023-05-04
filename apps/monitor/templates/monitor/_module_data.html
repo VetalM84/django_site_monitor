@@ -1,5 +1,4 @@
 <div class="mb-4" hx-target="this" hx-swap="innerHTML">
-    <a href hx-trigger="click" hx-get="{% url "htmx-edit-module" module.pk %}">Edit</a>
     <p><span class="fw-semibold">Active:</span> {{ module.is_active }}</p>
     <p>
     <form hx-headers='{ "X-CSRFToken": "{{ csrf_token }}" }'>
@@ -16,4 +15,10 @@
     <p><span class="fw-semibold">HTML tag class:</span> {{ module.container_html_tag_class }}
     </p>
     <p><span class="fw-semibold">Selector:</span> {{ module.container_selector }}</p>
+    <div class="d-flex justify-content-start">
+        <a href hx-trigger="click" hx-get="{% url "htmx-edit-module" module.pk %}">Edit</a>
+        <form hx-headers='{ "X-CSRFToken": "{{ csrf_token }}" }'>
+            <a class="ms-3" href hx-confirm="The module will be deleted. Are you sure?" hx-trigger="click" hx-post="{% url "htmx-delete-module" module.pk %}">Delete</a>
+        </form>
+    </div>
 </div>

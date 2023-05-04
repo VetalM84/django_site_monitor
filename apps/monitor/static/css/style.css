@@ -126,3 +126,6 @@ p {
     vertical-align: top;
     margin-bottom: 0.5rem;
 }
+.card .card-body .errorlist {
+    color: red !important;
+}
