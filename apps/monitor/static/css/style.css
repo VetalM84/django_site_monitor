@@ -55,7 +55,7 @@ p {
     min-width: 100%;
 }
 .card {
-    border: none !important;
+    border: 1px #ebebeb solid !important;
     border-radius: 20px !important;
 }
 .card .card-title {
@@ -74,6 +74,10 @@ p {
 .card-body {
     flex: 1 1 auto;
     padding: 1rem 1rem;
+}
+.card-tale {
+    background: #7DA0FA !important;
+    color: #ffffff !important;
 }
 .table thead th {
     border-top: 0;

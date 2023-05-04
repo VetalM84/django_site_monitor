@@ -44,17 +44,10 @@ class ProjectModule(models.Model):
         verbose_name="Project name",
     )
     is_active = models.BooleanField(default=True, verbose_name="Is Active")
-    date_created = models.DateTimeField(auto_now_add=True, verbose_name="Date created")
     url = models.URLField(verbose_name="URL")
     pagination = models.IntegerField(default=0, verbose_name="Pagination count")
-    container_html_tag = models.CharField(
-        max_length=1024, blank=True, default="", verbose_name="HTML Tag"
-    )
-    container_html_tag_class = models.CharField(
-        max_length=1024, blank=True, default="", verbose_name="HTML Tag class"
-    )
-    container_selector = models.CharField(
-        max_length=1024, blank=True, default="", verbose_name="Selector"
+    css_selector = models.CharField(
+        max_length=1024, blank=False, verbose_name="CSS selector"
     )
 
     def __str__(self):
@@ -67,45 +60,9 @@ class ProjectModule(models.Model):
         if self.pagination and self.url.find("$page$") == -1:
             raise ValidationError("URL with pagination must have $page$ pattern")
 
-        """Validation for tag, selector - one of them must be filled."""
-        if (not self.container_html_tag and not self.container_selector) or (
-            self.container_html_tag and self.container_selector
-        ):
-            raise ValidationError("Tag or Selector must be filled")
-
     class Meta:
         """Meta."""
 
         verbose_name = "Project module"
         verbose_name_plural = "Project modules"
         ordering = ["-is_active"]
-
-
-class ModuleItem(models.Model):
-    """Project Module Item Model."""
-
-    project_unit = models.ForeignKey(
-        ProjectModule,
-        related_name="module_items",
-        on_delete=models.CASCADE,
-        verbose_name="Project unit",
-    )
-    html_tag = models.CharField(
-        max_length=1024, blank=True, default="", verbose_name="HTML Tag"
-    )
-    html_tag_class = models.CharField(
-        max_length=1024, blank=True, default="", verbose_name="HTML Tag class"
-    )
-    selector = models.CharField(
-        max_length=1024, blank=True, default="", verbose_name="Selector"
-    )
-    html_attr = models.CharField(
-        max_length=1024, blank=True, default="", verbose_name="HTML attribute"
-    )
-    extract_text = models.BooleanField(default=False, verbose_name="Extract text")
-
-    class Meta:
-        """Meta."""
-
-        verbose_name = "Module item"
-        verbose_name_plural = "Module items"

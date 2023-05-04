@@ -9,16 +9,20 @@
             Check URL
         </button>
     </form>
-    </p>
     <p><span class="fw-semibold">Pagination count:</span> {{ module.pagination }}</p>
-    <p><span class="fw-semibold">HTML tag:</span> {{ module.container_html_tag }}</p>
-    <p><span class="fw-semibold">HTML tag class:</span> {{ module.container_html_tag_class }}
-    </p>
-    <p><span class="fw-semibold">Selector:</span> {{ module.container_selector }}</p>
+    <p><span class="fw-semibold">CSS selector:</span> {{ module.css_selector }}</p>
     <div class="d-flex justify-content-start">
-        <a href hx-trigger="click" hx-get="{% url "htmx-edit-module" module.pk %}">Edit</a>
+        <button class="btn btn-outline-primary btn-sm me-3" hx-trigger="click"
+                hx-get="{% url "htmx-edit-module" module.pk %}">
+            Edit
+        </button>
+        <button class="btn btn-outline-success btn-sm me-3" hx-trigger="click" hx-target="#result" hx-swap="innerHTML"
+                hx-get="{% url "htmx-test-module" module.pk %}">Test run
+        </button>
         <form hx-headers='{ "X-CSRFToken": "{{ csrf_token }}" }'>
-            <a class="ms-3" href hx-confirm="The module will be deleted. Are you sure?" hx-trigger="click" hx-post="{% url "htmx-delete-module" module.pk %}">Delete</a>
+            <button class="btn btn-outline-danger btn-sm me-3" hx-confirm="The module will be deleted. Are you sure?"
+                    hx-trigger="click" hx-post="{% url "htmx-delete-module" module.pk %}">Delete
+            </button>
         </form>
     </div>
 </div>

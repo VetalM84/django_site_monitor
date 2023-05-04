@@ -14,7 +14,7 @@
             </div>
         </div>
         <div class="col-md-3 grid-margin stretch-card">
-            <div class="card">
+            <div class="card card-tale">
                 <div class="card-body">
                     <p><span class="fw-semibold">Last run:</span> {{ project.last_run }}</p>
                     <p><span class="fw-semibold">Modules:</span> {{ project.modules.count }}</p>
@@ -23,22 +23,26 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-8 grid-margin">
+        <div class="col-md-12 grid-margin">
             <div class="card">
                 <div class="card-body">
                     <h2 class="card-title">Modules in this project</h2>
                     <!-- htmx get/edit module data -->
-                    {%  for module in project.modules.all %}
+                    {% for module in project.modules.all %}
                         {% include "monitor/_module_data.html" %}
                     {% endfor %}
                     <!-- htmx get/edit module data END -->
                 </div>
             </div>
         </div>
-        <div class="col-md-4 grid-margin">
+    </div>
+    <div class="row">
+        <div class="col-md-12 grid-margin">
             <div class="card">
                 <div class="card-body">
-                    <div id="result"></div>
+                    <h4 class="card-title">Test run preview</h4>
+                    <div id="result" class="d-flex justify-content-between"
+                         style="max-height: 400px; overflow: scroll;"></div>
                 </div>
             </div>
         </div>

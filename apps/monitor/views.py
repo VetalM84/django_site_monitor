@@ -2,21 +2,21 @@
 
 import asyncio
 
-import aiohttp
-from aiohttp import web
+import httpx
 from asgiref.sync import sync_to_async
-from django.http import HttpResponse, HttpResponseServerError, HttpResponseNotAllowed
+from bs4 import BeautifulSoup
+from django.http import HttpResponse, HttpResponseNotAllowed, HttpResponseServerError
 from django.shortcuts import render
 from formtools.wizard.views import SessionWizardView
 
-from .forms import ModuleItemForm, ProjectForm, ProjectModuleForm
-from .models import ModuleItem, Project, ProjectModule
+from .forms import ProjectForm, ProjectModuleForm
+from .models import Project, ProjectModule
 
 
 class ProjectWizardView(SessionWizardView):
     """New Project Wizard form set."""
 
-    form_list = [ProjectForm, ProjectModuleForm, ModuleItemForm]
+    form_list = [ProjectForm, ProjectModuleForm]
     template_name = "monitor/project_wizard.html"
 
     def done(self, form_list, **kwargs):
@@ -25,9 +25,6 @@ class ProjectWizardView(SessionWizardView):
         project_unit = form_list[1].save(commit=False)
         project_unit.project = project
         project_unit.save()
-        unit_items = form_list[2].save(commit=False)
-        unit_items.project_unit = project_unit
-        unit_items.save()
         return HttpResponse("Done")
 
 
@@ -65,14 +62,13 @@ async def call_url(url: str):
     # TODO: move to class
     # TODO: add headers to aiohttp.ClientSession
     # TODO: add timeout to aiohttp.ClientSession
-    # TODO: add exception handling
     try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url=url) as response:
-                return response
+        async with httpx.AsyncClient() as client:
+            response = client.get(url=url)
+            return await response
     except Exception as e:
         print(e)
-        return web.Response(status=500)
+        return httpx.Response(status_code=500)
 
 
 async def get_project_object(project_id: int):
@@ -88,15 +84,15 @@ async def htmx_call_url(request):
     # TODO: add user check
     if request.method == "POST":
         response = await call_url(url=request.POST.get("url"))
-        if response.status == 200:
+        if response.status_code == 200:
             return HttpResponse(content="Page response OK")
-        elif response.status == 404:
+        elif response.status_code == 404:
             return HttpResponse(content="Page not found")
         else:
-            # TODO: add errors list to else
+            # TODO: add errors list (elif error in errors[500,501,...])
             return HttpResponse(
-                content=f"Error. Response code is {response.status}",
-                status=response.status,
+                content=f"Error. Response code is {response.status_code}",
+                status=response.status_code,
             )
 
 
@@ -187,20 +183,18 @@ async def htmx_delete_module(request, module_id: int):
         return HttpResponseNotAllowed("Error. Method not allowed.")
 
 
-async def get_all_unit_items(request, unit_id: int):
-    """upon HTMX request."""
-    if request.method == "POST":
+async def htmx_test_run_module(request, module_id: int):
+    """Test run module with HTMX request."""
+    if request.method == "GET":
         try:
-            unit_items = list(
-                [
-                    item
-                    async for item in ModuleItem.objects.filter(project_unit_id=unit_id)
-                ]
-            )
-            return render(
-                request, "monitor/_unit_items.html", context={"unit_items": unit_items}
-            )
+            module_coroutine = ProjectModule.objects.aget(pk=module_id)
+            module = await module_coroutine
+            response = await call_url(url=module.url)
+            soup = BeautifulSoup(response.text, "lxml")
+            selector = soup.select_one(module.css_selector)
+
+            return HttpResponse(selector)
         except Exception as e:
-            return HttpResponse(f"Error: {e}")
+            return HttpResponseServerError(f"Error: {e}")
     else:
-        return HttpResponse("Error. Method not allowed.", status=405)
+        return HttpResponseNotAllowed("Error. Method not allowed.")

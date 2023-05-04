@@ -2,7 +2,7 @@
 
 from django import forms
 
-from apps.monitor.models import ModuleItem, Project, ProjectModule
+from apps.monitor.models import Project, ProjectModule
 
 
 class ProjectForm(forms.ModelForm):
@@ -34,11 +34,6 @@ class ProjectForm(forms.ModelForm):
 class ProjectModuleForm(forms.ModelForm):
     """Project Unit form."""
 
-    # project = forms.ModelChoiceField(
-    #     required=False,
-    #     queryset=Project.objects.all(),
-    #     widget=forms.Select(attrs={"class": "form-select"}),
-    # )
     url = forms.URLField(
         label="Url (with pagination pattern if any)",
         widget=forms.URLInput(
@@ -54,16 +49,7 @@ class ProjectModuleForm(forms.ModelForm):
         required=False,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
     )
-    container_html_tag = forms.CharField(
-        required=False,
-        widget=forms.TextInput(
-            attrs={"class": "form-control", "placeholder": "div, span, ul, etc."}
-        ),
-    )
-    container_html_tag_class = forms.CharField(
-        required=False, widget=forms.TextInput(attrs={"class": "form-control"})
-    )
-    container_selector = forms.CharField(
+    css_selector = forms.CharField(
         required=False, widget=forms.TextInput(attrs={"class": "form-control"})
     )
     is_active = forms.BooleanField(
@@ -77,44 +63,6 @@ class ProjectModuleForm(forms.ModelForm):
         fields = [
             "url",
             "pagination",
-            "container_html_tag",
-            "container_html_tag_class",
-            "container_selector",
+            "css_selector",
             "is_active",
         ]
-
-
-class ModuleItemForm(forms.ModelForm):
-    """Unit Item form."""
-
-    # project_unit = forms.ModelChoiceField(
-    #     queryset=ItemsContainer.objects.all(),
-    #     widget=forms.Select(attrs={"class": "form-select"}),
-    # )
-    html_tag = forms.CharField(
-        required=False,
-        widget=forms.TextInput(
-            attrs={"class": "form-control", "placeholder": "div, span, ul, ...."}
-        ),
-    )
-    html_tag_class = forms.CharField(
-        required=False, widget=forms.TextInput(attrs={"class": "form-control"})
-    )
-    selector = forms.CharField(
-        required=False, widget=forms.TextInput(attrs={"class": "form-control"})
-    )
-    html_attr = forms.CharField(
-        required=False, widget=forms.TextInput(attrs={"class": "form-control"})
-    )
-    extract_text = forms.BooleanField(
-        required=False,
-        widget=forms.CheckboxInput(
-            attrs={"class": "form-check", "placeholder": "href, data-id, ...."}
-        ),
-    )
-
-    class Meta:
-        """Meta."""
-
-        model = ModuleItem
-        exclude = ["project_unit"]
