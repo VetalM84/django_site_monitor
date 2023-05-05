@@ -32,6 +32,10 @@
                         {% include "monitor/_module_data.html" %}
                     {% endfor %}
                     <!-- htmx get/edit module data END -->
+                    <button hx-get="{% url "htmx-add-module" project.pk %}" hx-target="this" hx-trigger="click"
+                            hx-swap="beforebegin"
+                            class="btn btn-success btn-sm">Add module
+                    </button>
                 </div>
             </div>
         </div>
@@ -57,5 +61,16 @@
                 evt.detail.isError = true;
             }
         });
+    </script>
+    <script>
+        <!-- delete form from DOM by clicking Cancel button -->
+        function deleteForm(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.remove();
+                return true;
+            }
+            return false;
+        }
     </script>
 {% endblock %}

@@ -22,9 +22,9 @@ class ProjectWizardView(SessionWizardView):
     def done(self, form_list, **kwargs):
         """Save forms data to DB upon done."""
         project = form_list[0].save()
-        project_unit = form_list[1].save(commit=False)
-        project_unit.project = project
-        project_unit.save()
+        project_module = form_list[1].save(commit=False)
+        project_module.project = project
+        project_module.save()
         return HttpResponse("Done")
 
 
@@ -50,11 +50,7 @@ async def index(request):
 async def get_project(request, project_id: int):
     """Detailed project view with modules."""
     project = await Project.objects.prefetch_related("modules").aget(pk=project_id)
-    return render(
-        request,
-        "monitor/project.html",
-        context={"project": project, "call_url": call_url},
-    )
+    return render(request, "monitor/project.html", context={"project": project})
 
 
 async def call_url(url: str):
@@ -163,6 +159,31 @@ async def htmx_edit_module(request, module_id: int):
             return render(request, "monitor/_module_data.html", context=context)
         else:
             return render(request, "monitor/_edit_module.html", context=context)
+
+
+async def htmx_add_module(request, project_id: int):
+    """Add new module with HTMX request."""
+    module_form = ProjectModuleForm(request.POST or None)
+    project = await Project.objects.filter(pk=project_id).afirst()
+    context = {"form": module_form, "project": project}
+
+    # render form to save new module
+    if request.method == "GET":
+        return render(request, "monitor/_add_module.html", context=context)
+
+    # save new module upon form submission
+    elif request.method == "POST":
+        if module_form.is_valid():
+            new_module = module_form.save(commit=False)
+            new_module.project = project
+            await sync_to_async(new_module.save)()
+            return render(
+                request,
+                "monitor/_module_data.html",
+                context={"module": new_module},
+            )
+        else:
+            return render(request, "monitor/_add_module.html", context=context)
 
 
 async def htmx_get_module(request, module_id: int):

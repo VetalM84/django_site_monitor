@@ -50,7 +50,7 @@ class ProjectModuleForm(forms.ModelForm):
         widget=forms.NumberInput(attrs={"class": "form-control"}),
     )
     css_selector = forms.CharField(
-        required=False, widget=forms.TextInput(attrs={"class": "form-control"})
+        required=True, widget=forms.TextInput(attrs={"class": "form-control"})
     )
     is_active = forms.BooleanField(
         required=False, widget=forms.CheckboxInput(attrs={"class": "form-check"})

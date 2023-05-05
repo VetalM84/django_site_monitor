@@ -11,6 +11,7 @@ from apps.monitor.views import (
     htmx_get_project,
     htmx_test_run_module,
     index,
+    htmx_add_module,
 )
 
 urlpatterns = [
@@ -21,13 +22,14 @@ urlpatterns = [
 htmx_patterns = [
     path("call_url/", htmx_call_url, name="htmx-call-url"),
     path("project/<int:project_id>/edit/", htmx_edit_project, name="htmx-edit-project"),
-    path("get-project/<int:project_id>/", htmx_get_project, name="htmx-get-project"),
+    path("project/<int:project_id>/get/", htmx_get_project, name="htmx-get-project"),
+    path("module/<int:project_id>/add/", htmx_add_module, name="htmx-add-module"),
+    path("module/<int:module_id>/", htmx_get_module, name="htmx-get-module"),
     path("module/<int:module_id>/run/", htmx_test_run_module, name="htmx-test-module"),
     path(
         "module/<int:module_id>/delete/", htmx_delete_module, name="htmx-delete-module"
     ),
     path("module/<int:module_id>/edit/", htmx_edit_module, name="htmx-edit-module"),
-    path("get-module/<int:module_id>/", htmx_get_module, name="htmx-get-module"),
 ]
 
 urlpatterns += htmx_patterns

@@ -1,0 +1,6 @@
+<form id="new-module-form" class="mb-3" hx-post="{% url "htmx-add-module" project.pk %}" hx-target="this" hx-swap="outerHTML">
+    {% csrf_token %}
+    {{ form.as_div }}
+    <button type="submit" class="btn btn-primary">Submit</button>
+    <button onclick="deleteForm('new-module-form')" class="btn btn-secondary">Cancel</button>
+</form>
