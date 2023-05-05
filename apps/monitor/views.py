@@ -49,7 +49,9 @@ async def index(request):
 
 async def get_project(request, project_id: int):
     """Detailed project view with modules."""
-    project = await Project.objects.prefetch_related("modules").aget(pk=project_id)
+    project: Project = await Project.objects.prefetch_related("modules").aget(
+        pk=project_id
+    )
     return render(request, "monitor/project.html", context={"project": project})
 
 
@@ -93,7 +95,7 @@ async def htmx_call_url(request):
 
 
 async def htmx_get_project_to_edit(request, project_id: int):
-    project = await get_project_object(project_id=project_id)
+    project: Project = await get_project_object(project_id=project_id)
     form = ProjectForm(instance=project)
     return render(
         request,
@@ -104,7 +106,7 @@ async def htmx_get_project_to_edit(request, project_id: int):
 
 async def htmx_get_project(request, project_id: int):
     """Get project html data with HTMX request."""
-    project = await get_project_object(project_id=project_id)
+    project: Project = await get_project_object(project_id=project_id)
     return render(
         request,
         "monitor/_project_data.html",
@@ -114,7 +116,7 @@ async def htmx_get_project(request, project_id: int):
 
 async def htmx_edit_project(request, project_id: int):
     """Edit project with HTMX request."""
-    project = await get_project_object(project_id=project_id)
+    project: Project = await get_project_object(project_id=project_id)
     project_form = ProjectForm(request.POST or None, instance=project)
 
     # get edit form with data
@@ -145,7 +147,7 @@ async def get_module_object(module_id: int):
 
 async def htmx_edit_module(request, module_id: int):
     """Edit module with HTMX request."""
-    module = await get_module_object(module_id=module_id)
+    module: ProjectModule = await get_module_object(module_id=module_id)
     module_form = ProjectModuleForm(request.POST or None, instance=module)
     context = {"module": module, "form": module_form}
 
@@ -164,7 +166,7 @@ async def htmx_edit_module(request, module_id: int):
 async def htmx_add_module(request, project_id: int):
     """Add new module with HTMX request."""
     module_form = ProjectModuleForm(request.POST or None)
-    project = await Project.objects.filter(pk=project_id).afirst()
+    project: Project = await Project.objects.filter(pk=project_id).afirst()
     context = {"form": module_form, "project": project}
 
     # render form to save new module
@@ -188,7 +190,7 @@ async def htmx_add_module(request, project_id: int):
 
 async def htmx_get_module(request, module_id: int):
     """Get project html data with HTMX request."""
-    module = await get_module_object(module_id=module_id)
+    module: ProjectModule = await get_module_object(module_id=module_id)
     return render(request, "monitor/_module_data.html", context={"module": module})
 
 
@@ -208,8 +210,7 @@ async def htmx_test_run_module(request, module_id: int):
     """Test run module with HTMX request."""
     if request.method == "GET":
         try:
-            module_coroutine = ProjectModule.objects.aget(pk=module_id)
-            module = await module_coroutine
+            module: ProjectModule = await ProjectModule.objects.aget(pk=module_id)
             response = await call_url(url=module.url)
             soup = BeautifulSoup(response.text, "lxml")
             selector = soup.select_one(module.css_selector)
