@@ -4,6 +4,8 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse_lazy
 
+from apps.accounts.models import User
+
 
 class Project(models.Model):
     """Project Model."""
@@ -15,8 +17,7 @@ class Project(models.Model):
     is_active = models.BooleanField(default=False, verbose_name="Is active")
     date_created = models.DateTimeField(auto_now_add=True, verbose_name="Date created")
     last_run = models.DateTimeField(null=True, blank=True, verbose_name="Last run")
-
-    # user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="User")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="User")
 
     def __str__(self):
         """String representation of the model."""
