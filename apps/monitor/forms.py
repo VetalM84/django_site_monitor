@@ -46,6 +46,7 @@ class ProjectModuleForm(forms.ModelForm):
     pagination = forms.IntegerField(
         label="Pagination count",
         initial=0,
+        min_value=2,
         required=False,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
     )

@@ -1,6 +1,7 @@
-"""Monitor models."""
+"""Site change monitor models."""
 
 from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.urls import reverse_lazy
 
@@ -46,7 +47,9 @@ class ProjectModule(models.Model):
     )
     is_active = models.BooleanField(default=True, verbose_name="Is Active")
     url = models.URLField(verbose_name="URL")
-    pagination = models.IntegerField(default=0, verbose_name="Pagination count")
+    pagination = models.IntegerField(
+        default=0, validators=[MinValueValidator(2)], verbose_name="Pagination count"
+    )
     css_selector = models.CharField(
         max_length=1024, blank=False, verbose_name="CSS selector"
     )
