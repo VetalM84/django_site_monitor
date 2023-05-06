@@ -58,6 +58,11 @@ class ProjectModule(models.Model):
         """String representation of the model."""
         return self.project.name + ", " + self.url[:50] + "..."
 
+    # def save(self, *args, **kwargs):
+    #     """Save method."""
+    #     super().save()
+    #     # TODO: send request to url, save response status code, scrap data
+
     def clean(self):
         """Validation for url, pagination."""
         # TODO: send request to url, check response status code
@@ -70,3 +75,29 @@ class ProjectModule(models.Model):
         verbose_name = "Project module"
         verbose_name_plural = "Project modules"
         ordering = ["-is_active"]
+
+
+class ScrapResult(models.Model):
+    """Scrap result model."""
+
+    module = models.ForeignKey(
+        ProjectModule,
+        related_name="scrap_results",
+        on_delete=models.CASCADE,
+        verbose_name="Project module",
+    )
+    date_created = models.DateTimeField(auto_now_add=True, verbose_name="Date created")
+    data = models.TextField(verbose_name="Data")
+    status_code = models.IntegerField(verbose_name="Status code")
+    error = models.TextField(verbose_name="Error", null=True, blank=True)
+
+    def __str__(self):
+        """String representation of the model."""
+        return self.module.project.name + ", " + self.module.url[:50] + "..."
+
+    class Meta:
+        """Meta."""
+
+        verbose_name = "Scrap result"
+        verbose_name_plural = "Scrap results"
+        ordering = ["-date_created", "module"]
