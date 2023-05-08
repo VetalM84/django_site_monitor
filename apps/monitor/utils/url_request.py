@@ -10,13 +10,11 @@ from apps.monitor.models import ProjectModule
 class URLRequest:
     """URL request class."""
 
-    client = AsyncClient(follow_redirects=True)
-
     def __init__(self):
         """Init."""
         # TODO: add headers to AsyncClient
         # TODO: add timeout to AsyncClient
-        pass
+        self.client = AsyncClient(follow_redirects=True)
 
     async def get_url(self, url: str) -> Response:
         """Request url with GET method."""
