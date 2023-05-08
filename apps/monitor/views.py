@@ -2,15 +2,22 @@
 
 import asyncio
 
-import httpx
 from asgiref.sync import sync_to_async
 from bs4 import BeautifulSoup
-from django.http import HttpResponse, HttpResponseNotAllowed, HttpResponseServerError
+from django.contrib.auth.models import AnonymousUser
+from django.http import (
+    HttpRequest,
+    HttpResponse,
+    HttpResponseNotAllowed,
+    HttpResponseServerError,
+)
 from django.shortcuts import render
 from formtools.wizard.views import SessionWizardView
 
+from ..accounts.models import User
 from .forms import ProjectForm, ProjectModuleForm
-from .models import Project, ProjectModule
+from .models import Project, ProjectModule, ScrapResult
+from .utils.url_request import URLRequest
 
 
 class ProjectWizardView(SessionWizardView):
@@ -21,7 +28,9 @@ class ProjectWizardView(SessionWizardView):
 
     def done(self, form_list, **kwargs):
         """Save forms data to DB upon done."""
-        project = form_list[0].save()
+        project = form_list[0].save(commit=False)
+        project.user = self.request.user
+        project.save()
         project_module = form_list[1].save(commit=False)
         project_module.project = project
         project_module.save()
@@ -30,17 +39,10 @@ class ProjectWizardView(SessionWizardView):
 
 # async def index(request):
 #     """Index view."""
-#     projects = list(
-#         [
-#             project
-#             async for project in Project.objects.all().prefetch_related("project_units")
-#         ]
-#     )
 #     return render(request, "monitor/index.html", context={"projects": projects})
 
 
-async def index(request):
-    # TODO: replace with user's dashboard
+async def user_dashboard(request):
     projects = list(
         [project async for project in Project.objects.all().prefetch_related("modules")]
     )
@@ -55,15 +57,14 @@ async def get_project(request, project_id: int):
     return render(request, "monitor/project.html", context={"project": project})
 
 
-async def call_url(url: str):
-    """Make a request to an external url."""
-    # TODO: move to class
-    # TODO: add headers to aiohttp.ClientSession
-    # TODO: add timeout to aiohttp.ClientSession
+async def save_parsed_data(module, status_code):
+    """Save parsed data to DB."""
     try:
-        async with httpx.AsyncClient() as client:
-            response = client.get(url=url)
-            return await response
+        result = ScrapResult()
+        # result.data = await parse_data()
+        result.module = module
+        result.status_code = status_code
+        await result.asave()
     except Exception as e:
         print(e)
         return httpx.Response(status_code=500)
@@ -77,13 +78,29 @@ async def get_project_object(project_id: int):
         return HttpResponseServerError(f"Error: {e}")
 
 
-async def htmx_call_url(request):
+@sync_to_async
+def get_user_from_request(request: HttpRequest) -> User | AnonymousUser | None:
+    """Async get user object from request."""
+    return request.user if bool(request.user) else None
+
+
+async def htmx_test_call_url(request):
     """Call url with HTMX request."""
-    # TODO: add user check
-    if request.method == "POST":
-        response = await call_url(url=request.POST.get("url"))
+    user = await get_user_from_request(request)
+    client = URLRequest()
+
+    if user.is_authenticated and request.method == "POST":
+        # TODO: call_url with POST method
+        module: ProjectModule = await ProjectModule.objects.aget(
+            pk=request.POST.get("module_id")
+        )
+
+        response = await client.get_url_with_pagination(module)
+
         if response.status_code == 200:
             return HttpResponse(content="Page response OK")
+        elif response.status_code in [301, 302]:
+            return HttpResponse(content="Page redirected")
         elif response.status_code == 404:
             return HttpResponse(content="Page not found")
         else:
@@ -196,6 +213,7 @@ async def htmx_get_module(request, module_id: int):
 
 async def htmx_delete_module(request, module_id: int):
     """Delete project form DB with HTMX request."""
+    # TODO: add user check
     if request.method == "POST":
         try:
             await ProjectModule.objects.filter(pk=module_id).adelete()
@@ -208,10 +226,12 @@ async def htmx_delete_module(request, module_id: int):
 
 async def htmx_test_run_module(request, module_id: int):
     """Test run module with HTMX request."""
+    # TODO: add user check
+    client = URLRequest()
     if request.method == "GET":
         try:
             module: ProjectModule = await ProjectModule.objects.aget(pk=module_id)
-            response = await call_url(url=module.url)
+            response = await client.get_url_with_pagination(module=module)
             soup = BeautifulSoup(response.text, "lxml")
             selector = soup.select_one(module.css_selector)
 

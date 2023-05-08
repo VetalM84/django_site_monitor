@@ -37,7 +37,7 @@ class ProjectModuleAdmin(admin.ModelAdmin):
 class ScrapResultAdmin(admin.ModelAdmin):
     """ScrapResult model views on backend."""
 
-    list_display = ("id", "module", "date_created", "status_code", "error")
+    list_display = ("id", "module", "date_created", "status_code")
     list_display_links = ("id", "module")
     ordering = ("date_created", "module")
     search_fields = ("data",)

@@ -54,7 +54,8 @@ class ProjectModuleForm(forms.ModelForm):
         required=True, widget=forms.TextInput(attrs={"class": "form-control"})
     )
     is_active = forms.BooleanField(
-        required=False, widget=forms.CheckboxInput(attrs={"class": "form-check"})
+        required=False,
+        widget=forms.CheckboxInput(attrs={"class": "form-check", "checked": True}),
     )
 
     class Meta:

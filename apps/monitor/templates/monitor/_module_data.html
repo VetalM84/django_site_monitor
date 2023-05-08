@@ -3,7 +3,7 @@
     <p>
     <form hx-headers='{ "X-CSRFToken": "{{ csrf_token }}" }'>
         <span class="fw-semibold">URL:</span> {{ module.url }}
-        <input type="hidden" name="url" value="{{ module.url }}">
+        <input type="hidden" name="module_id" value="{{ module.id }}">
         <button class="btn btn-outline-secondary btn-sm ms-2" hx-trigger="click"
                 hx-post="{% url "htmx-call-url" %}" hx-target="this" hx-swap="innerHTML">
             Check URL
