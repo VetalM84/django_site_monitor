@@ -15,7 +15,7 @@ class ProjectForm(forms.ModelForm):
     )
     check_interval = forms.IntegerField(
         label="Check Interval in hours",
-        initial=12,
+        initial=24,
         min_value=1,
         max_value=744,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
@@ -46,7 +46,6 @@ class ProjectModuleForm(forms.ModelForm):
     pagination = forms.IntegerField(
         label="Pagination count",
         initial=0,
-        min_value=2,
         required=False,
         widget=forms.NumberInput(attrs={"class": "form-control"}),
     )

@@ -1,7 +1,6 @@
 """Site change monitor models."""
 
 from django.core.exceptions import ValidationError
-from django.core.validators import MinValueValidator
 from django.db import models
 from django.urls import reverse_lazy
 
@@ -34,7 +33,7 @@ class Project(models.Model):
         verbose_name = "Project"
         verbose_name_plural = "Projects"
         ordering = ["name", "-is_active"]
-        # unique_together = ["user", "name"]
+        unique_together = ["user", "name"]
 
 
 class ProjectModule(models.Model):
@@ -48,9 +47,7 @@ class ProjectModule(models.Model):
     )
     is_active = models.BooleanField(default=True, verbose_name="Is Active")
     url = models.URLField(verbose_name="URL")
-    pagination = models.IntegerField(
-        default=0, validators=[MinValueValidator(2)], verbose_name="Pagination count"
-    )
+    pagination = models.IntegerField(default=0, verbose_name="Pagination count")
     css_selector = models.CharField(
         max_length=1024, blank=False, verbose_name="CSS selector"
     )
@@ -86,10 +83,10 @@ class ScrapResult(models.Model):
         on_delete=models.CASCADE,
         verbose_name="Project module",
     )
+    url = models.URLField(blank=True, verbose_name="URL")
+    data = models.TextField(blank=True, verbose_name="Data")
     date_created = models.DateTimeField(auto_now_add=True, verbose_name="Date created")
-    data = models.TextField(verbose_name="Data")
     status_code = models.IntegerField(verbose_name="Status code")
-    error = models.TextField(verbose_name="Error", null=True, blank=True)
 
     def __str__(self):
         """String representation of the model."""
