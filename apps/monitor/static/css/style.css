@@ -60,7 +60,7 @@ p {
 }
 .card .card-title {
     color: #010101;
-    margin-bottom: 1.2rem;
+    margin-bottom: 1.2rem !important;
     text-transform: capitalize;
     font-size: 1.125rem;
     font-weight: 600;

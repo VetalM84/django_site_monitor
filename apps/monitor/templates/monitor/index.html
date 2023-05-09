@@ -10,7 +10,6 @@
                         <table class="table table-striped table-hover">
                             <thead>
                             <tr>
-                                <th></th>
                                 <th>Name</th>
                                 <th>Interval</th>
                                 <th>Last run</th>
@@ -22,14 +21,7 @@
                             <tbody>
                             {% for project in projects %}
                                 <tr>
-                                    <td>
-                                        <div class="form-check form-check-muted m-0">
-                                            <label class="form-check-label">
-                                                <input type="checkbox" class="form-check-input">
-                                                <i class="input-helper"></i></label>
-                                        </div>
-                                    </td>
-                                    <td><a href="{% url "get-project" project.id %}">{{ project.name|truncatechars:25 }}</a></td>
+                                    <td><a href="{% url "project" project.id %}">{{ project.name|truncatechars:25 }}</a></td>
                                     <td>{{ project.check_interval }} hour{{ project.check_interval|pluralize }}</td>
                                     <td>{{ project.last_run }}</td>
                                     <td>{{ project.modules.count }}</td>

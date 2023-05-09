@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Reports</h4>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>URL</th>
+                                <th>Date</th>
+                                <th>Status code</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for report in reports %}
+                                <tr>
+                                    <td><a href="{% url "report" report.pk %}">{{ report.pk }}</a></td>
+                                    <td>{{ report.url|truncatechars:35 }}</td>
+                                    <td>{{ report.date_created }}</td>
+                                    <td>{{ report.status_code }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="7">No reports found</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

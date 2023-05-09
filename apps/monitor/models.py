@@ -25,7 +25,8 @@ class Project(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return reverse_lazy("get-project", kwargs={"project_id": self.pk})
+        """Get absolute url."""
+        return reverse_lazy("project", kwargs={"project_id": self.pk})
 
     class Meta:
         """Meta."""
@@ -65,7 +66,6 @@ class ProjectModule(models.Model):
 
     def clean(self):
         """Validation for url, pagination."""
-        # TODO: send request to url, check response status code
         if self.pagination and self.url.find("$page$") == -1:
             raise ValidationError("URL with pagination must have $page$ pattern")
 

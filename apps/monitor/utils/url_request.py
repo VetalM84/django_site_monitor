@@ -1,6 +1,6 @@
 """Class to work with requests to urls via httpx lib."""
 
-import random
+from random import randint
 
 from httpx import AsyncClient, Response
 
@@ -41,9 +41,7 @@ class URLRequest:
         url = module.url
         # use random page number if pagination is enabled
         if module.pagination:
-            url = module.url.replace(
-                "$page$", str(random.randint(1, module.pagination))
-            )
+            url = module.url.replace("$page$", str(randint(1, module.pagination)))
 
         response = await self.get_url(url=url)
         return response
