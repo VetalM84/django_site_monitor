@@ -1,6 +1,7 @@
 """."""
 
-import asyncio
+from dataclasses import dataclass
+import difflib
 
 from asgiref.sync import sync_to_async
 from bs4 import BeautifulSoup
@@ -57,17 +58,134 @@ async def get_project(request, project_id: int):
     return render(request, "monitor/project.html", context={"project": project})
 
 
-async def save_parsed_data(module, status_code):
+async def save_parsed_data(module_id: int, url: str, status_code: int, data: str):
     """Save parsed data to DB."""
     try:
-        result = ScrapResult()
-        # result.data = await parse_data()
-        result.module = module
-        result.status_code = status_code
-        await result.asave()
+        result = await ScrapResult.objects.acreate(
+            data=data,
+            module_id=module_id,
+            url=url,
+            status_code=status_code,
+        )
+        return result
     except Exception as e:
         print(e)
-        return httpx.Response(status_code=500)
+        raise ValueError(e)
+
+
+async def scap_save(request):
+    client = URLRequest()
+    module: ProjectModule = await ProjectModule.objects.prefetch_related(
+        "project"
+    ).aget(pk=1)
+    url_response = await client.get_url(url=module.url)
+    soup = BeautifulSoup(url_response, "lxml")
+    print(soup.original_encoding)
+    result = soup.select(module.css_selector)
+    print(result)
+
+    # await save_parsed_data(1, module.url, url_response.status_code, result)
+
+    return render(request, "monitor/result.html", context={"result": result})
+
+
+# async def parse_data():
+#     """Parse data from the webpage."""
+#     try:
+#         module: ProjectModule = await ProjectModule.objects.aget(pk=module_id)
+#         response = await call_url_with_pagination(module=module)
+#         soup = BeautifulSoup(response.text, "lxml")
+#         result = soup.select_one(module.css_selector)
+#         return HttpResponse(result)
+#     except Exception as e:
+#         return HttpResponseServerError(f"Error: {e}")
+
+
+def inline_diff(a, b):
+    """Inline diff."""
+    matcher = difflib.SequenceMatcher(None, a=a, b=b)
+
+    def process_tag(tag, i1, i2, j1, j2):
+        if tag == "replace":
+            return "{" + matcher.a[i1:i2] + " -> " + matcher.b[j1:j2] + "}"
+        if tag == "delete":
+            return "{- " + matcher.a[i1:i2] + "}"
+        if tag == "equal":
+            return matcher.a[i1:i2]
+        if tag == "insert":
+            return "{+ " + matcher.b[j1:j2] + "}"
+        assert False, "Unknown tag %r" % tag
+
+    return "".join(process_tag(*t) for t in matcher.get_opcodes())
+
+
+def show_diff(seqm):
+    """Unify operations between two compared strings
+    seqm is a difflib.SequenceMatcher instance whose a & b are strings"""
+    output = []
+    for opcode, a0, a1, b0, b1 in seqm.get_opcodes():
+        if opcode == "equal":
+            output.append(seqm.a[a0:a1])
+        elif opcode == "insert":
+            output.append("<b>" + seqm.b[b0:b1] + "</b>")
+        elif opcode == "delete":
+            output.append("<del>" + seqm.a[a0:a1] + "</del>")
+        elif opcode == "replace":
+            raise NotImplementedError("what to do with 'replace' opcode?")
+        else:
+            raise RuntimeError(f"unexpected opcode unknown opcode {opcode}")
+    return "".join(output)
+
+
+async def diff_view(request):
+    """Diff view."""
+    a = await ScrapResult.objects.aget(pk=35)
+    b = await ScrapResult.objects.aget(pk=36)
+    # results = list([result async for result in ScrapResult.objects.all()])[:2]
+    results = [a, b]
+
+    sd = show_diff(
+        difflib.SequenceMatcher(None, a.data.splitlines()[0], b.data.splitlines()[0])
+    )
+
+    # ind = inline_diff(a.data.splitlines()[0], b.data.splitlines()[0])
+    ind = inline_diff(a.data.splitlines()[0], b.data.splitlines()[0])
+
+    ud = difflib.unified_diff(
+        results[0].data.splitlines(), results[1].data.splitlines(), n=2
+    )
+    cd = difflib.context_diff(
+        results[0].data.splitlines(), results[1].data.splitlines(), n=2
+    )
+
+    # print(result)
+    return render(
+        request,
+        "monitor/diff-view.html",
+        context={"ud": ud, "cd": cd, "ind": ind, "sd": sd},
+    )
+
+
+async def get_single_report(request, report_id: int):
+    user = await get_user_from_request(request)
+    report: ScrapResult = await ScrapResult.objects.prefetch_related(
+        "module__project"
+    ).aget(pk=report_id, module__project__user=user)
+    return render(request, "monitor/report.html", context={"report": report})
+
+
+async def get_module_reports(request, module_id: int):
+    # TODO: add pagination
+    user = await get_user_from_request(request)
+    reports: list[ScrapResult] = list(
+        [
+            report
+            async for report in ScrapResult.objects.prefetch_related(
+                "module__project"
+            ).filter(module_id=module_id, module__project__user=user)
+        ]
+    )
+    return render(request, "monitor/reports.html", context={"reports": reports})
 
 
 async def get_project_object(project_id: int):

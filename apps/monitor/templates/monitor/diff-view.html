@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Diff view{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    /**************sd***************************/
+                        <p>{{ sd }}</p>
+                    /**************ind***************************/
+                        <p>{{ ind }}</p>
+                    /**************unified***************************/
+                    {% for i in ud %}
+                        <p>{{ i }}</p>
+                    {% endfor %}
+                    /**************cd***************************/
+                    {% for i in cd %}
+                        <p>{{ i }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+{% endblock %}

@@ -14,7 +14,8 @@ class URLRequest:
         """Init."""
         # TODO: add headers to AsyncClient
         # TODO: add timeout to AsyncClient
-        self.client = AsyncClient(follow_redirects=True)
+        self._headers = {"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36"}
+        self.client = AsyncClient(follow_redirects=True, headers=self._headers)
 
     async def get_url(self, url: str) -> Response:
         """Request url with GET method."""
